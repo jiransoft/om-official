@@ -2,7 +2,7 @@
 
 > **Pre-release (RC) channel** — 이 브랜치는 정식 릴리즈 전 테스트용입니다.
 >
-> - 현재 RC 태그: `0.2.99-rc.616c544`
+> - 현재 RC 태그: `0.2.99-rc.f21ba85`
 > - RC 설치:
 >   - `/plugin marketplace add nextintelligence-ai/officemail-official@rc`
 >   - `/plugin install officemail@officemail-rc`
@@ -15,7 +15,7 @@
 OfficeMail 서비스의 공식 마켓플레이스입니다.
 메일, 캘린더 등 OfficeMail이 제공하는 서비스를 AI 에이전트에서 사용할 수 있습니다.
 
-## OfficeMail CLI 0.2.99-rc.616c544
+## OfficeMail CLI 0.2.99-rc.f21ba85
 
 AI 에이전트가 OfficeMail 서비스의 이메일과 캘린더를 읽고, 보내고, 관리할 수 있는
 Claude Code 플러그인이자 MCP 서버입니다.

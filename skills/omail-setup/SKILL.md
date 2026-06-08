@@ -73,7 +73,7 @@ If this returns inbox data, setup is complete.
     ${CLAUDE_PLUGIN_DATA}/omail auth reset         # delete all profiles, credentials, and config
     ${CLAUDE_PLUGIN_DATA}/omail auth token <t>     # update Bearer token
     ${CLAUDE_PLUGIN_DATA}/omail auth whoami        # verify current session
-    ${CLAUDE_PLUGIN_DATA}/omail auth refresh       # force refresh session cache
+    ${CLAUDE_PLUGIN_DATA}/omail auth refresh       # force-refresh OAuth access token (if any) + session cache
 
 ## Multi-profile commands
 
@@ -141,7 +141,16 @@ This is a full factory reset — the user must set up from scratch.
 - Multi-profile: config uses `{ default, profiles: { name: config } }` format
 - Old single-account config is auto-migrated on first load
 - Claude Code plugin, Claude Desktop MCP, and CLI all share the same config
-- Session uses lazy refresh (refresh on 401, retry once)
+- OAuth tokens auto-renew: any command hitting a 401 with a valid refresh
+  token mints a new access token and retries — including `doctor` and
+  `auth refresh`. A `doctor` auth failure means the refresh token itself is
+  exhausted, so `omail auth login` is genuinely required (not a transient
+  expiry). Manual (Bearer-token) profiles cannot auto-renew.
+- The refresh token is a sliding window (renewed on every refresh). Re-login
+  is only needed after the refresh-token lifetime elapses with NO activity —
+  any command that triggers a refresh resets the window. Access-token
+  lifetimes are short and server-controlled (e.g. dev is shorter than prod),
+  but the renewal is transparent.
 - `--profile` selects auth credentials; `--account` overrides JMAP accountId
 - MCP tools accept an optional `profile` parameter for per-call profile selection
 - MCP `account_switch` sets session-level default (in-process, does not persist)
