@@ -17,6 +17,8 @@ argument-hint: "[list | search | add | update | delete | get | addressbooks]"
 - `$ARGUMENTS` = `list` → skip to **List contacts** section
 - `$ARGUMENTS` = `search` → skip to **Search contacts** section
 - `$ARGUMENTS` = `add` → skip to **Add contact** section
+- `$ARGUMENTS` = `update` → skip to **Update contact** section
+- `$ARGUMENTS` = `delete` → skip to **Delete contact** section
 - `$ARGUMENTS` = `get` → skip to **Get contact details** section
 - `$ARGUMENTS` = `addressbooks` → skip to **Address books** section
 - Empty or anything else → use full skill reference
@@ -121,7 +123,10 @@ Contacts integrate with mail and calendar for workflows like
     ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard get --params '{"ids":["..."]}'
     ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard query --params '{"filter":{"text":"alice"}}'
     ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard set --json '{"create":{"c1":{"fullName":"Test","emails":{"e1":{"address":"test@example.com"}}}}}'
+    ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard changes --params '{"sinceState":"<state>"}'
+    ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard queryChanges --params '{"sinceQueryState":"<qs>","filter":{}}'
     ${CLAUDE_PLUGIN_DATA}/omail contacts addressbook get --params '{}'
+    ${CLAUDE_PLUGIN_DATA}/omail contacts addressbook changes --params '{"sinceState":"<state>"}'
 
 ## Notes
 

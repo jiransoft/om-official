@@ -159,8 +159,11 @@ When the user says "change the recurring meeting" without specifying which one:
     ${CLAUDE_PLUGIN_DATA}/omail calendar calendarevent get --params '{...}'
     ${CLAUDE_PLUGIN_DATA}/omail calendar calendarevent query --params '{"filter":{}}'
     ${CLAUDE_PLUGIN_DATA}/omail calendar calendarevent set --json '{"create":{"e1":{...}}}'
+    ${CLAUDE_PLUGIN_DATA}/omail calendar calendarevent changes --params '{"sinceState":"<state>"}'
+    ${CLAUDE_PLUGIN_DATA}/omail calendar calendarevent queryChanges --params '{"sinceQueryState":"<qs>","filter":{}}'
     ${CLAUDE_PLUGIN_DATA}/omail calendar calendar get --params '{}'
     ${CLAUDE_PLUGIN_DATA}/omail calendar calendar set --json '{"create":{"c1":{"name":"Work"}}}'
+    ${CLAUDE_PLUGIN_DATA}/omail calendar calendar changes --params '{"sinceState":"<state>"}'
 
 ## Notes
 
