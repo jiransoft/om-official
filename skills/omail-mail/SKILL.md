@@ -47,7 +47,7 @@ argument-hint: "[send | reply | forward | triage | read | search | move | flag |
 | `+read`      | Read message body (`--raw`, `--save-attachments [dir]`)                                                |
 | `+search`    | Full-text search (`--query`, `--after`, `--before`, `--mailbox`, `--limit`, `--page-all`, `--backend`) |
 | `+thread`    | Thread navigation: `by-message-id <id>` resolves a Message-ID to its full tree                         |
-| `+move`      | Move between mailboxes                                                                                 |
+| `+move`      | Move between mailboxes (`--to` takes a name or a role, e.g. `Archive` → role `archive`)                |
 | `+flag`      | Set/unset keywords                                                                                     |
 | `+draft`     | Save to Drafts (`--cc`, `--html`)                                                                      |
 | `+watch`     | Watch for new emails via EventSource (`--raw`, `--ping`)                                               |

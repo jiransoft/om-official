@@ -178,12 +178,20 @@ When the user says "change the recurring meeting" without specifying which one:
   `--recurrence-id` returns an error prompting the user to specify
 - `--alert <minutes>` is repeatable; `--use-default-alerts` overrides custom alerts
 - `--online` only accepts https/http URLs (blocks javascript:/data:)
-- `--all-day` requires date-only `--start` (YYYY-MM-DD); duration in days
+- `--all-day` requires date-only `--start` (YYYY-MM-DD); duration in days.
+  On the wire the start is sent as a LocalDateTime at midnight
+  (`YYYY-MM-DDT00:00:00`) with `showWithoutTime: true` — a bare date is
+  rejected by the server
 - `--add-invite` auto-creates organizer from session when event has no participants
 - `+copy` requires target account to have calendar capability
 - `+parse` checks capability + catches unknownMethod (belt+suspenders)
-- Calendar sharing requires `urn:ietf:params:jmap:sharing` capability;
-  roles: reader, writer, admin
+- Calendar sharing is the `shareWith` property of `Calendar/set` under
+  `urn:ietf:params:jmap:calendars` — no separate sharing capability exists.
+  Roles: reader, writer, admin. `unshare` fails if the calendar is not
+  currently shared with that user
+- `--recurrence-id` works on a recurring event that has no overrides yet:
+  the CLI reads `recurrenceOverrides` first and seeds the map when it is
+  null (a pointer patch into a null map is `invalidPatch` per RFC 8620)
 - Multi-user freebusy (`--email`) requires
   `urn:ietf:params:jmap:principals` capability
 - Always use `--dry-run` first when creating or modifying events via AI

@@ -3,7 +3,7 @@
 OfficeMail 서비스의 공식 마켓플레이스입니다.
 메일, 캘린더 등 OfficeMail이 제공하는 서비스를 AI 에이전트에서 사용할 수 있습니다.
 
-## OfficeMail CLI 0.2.99
+## OfficeMail CLI 0.2.100
 
 AI 에이전트가 OfficeMail 서비스의 이메일과 캘린더를 읽고, 보내고, 관리할 수 있는
 Claude Code 플러그인이자 MCP 서버입니다.
