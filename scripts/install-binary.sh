@@ -7,7 +7,7 @@ PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-.}"
 VERSION_FILE="$DATA_DIR/.version"
 CURRENT_VERSION=$(grep '"version"' "$PLUGIN_ROOT/.claude-plugin/plugin.json" | head -1 | sed 's/.*: *"\(.*\)".*/\1/')
 BINARY="$DATA_DIR/omail"
-REPO="nextintelligence-ai/officemail-official"
+REPO="jiransoft/om-official"
 
 # Detect platform and architecture
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
