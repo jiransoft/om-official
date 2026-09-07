@@ -4,7 +4,7 @@
 >
 > - 현재 RC 태그: `0.2.99-rc.f21ba85`
 > - RC 설치:
->   - `/plugin marketplace add nextintelligence-ai/officemail-official@rc`
+>   - `/plugin marketplace add jiransoft/om-official@rc`
 >   - `/plugin install officemail@officemail-rc`
 > - 안정 버전으로 복귀:
 >   - `/plugin uninstall officemail@officemail-rc`
@@ -33,13 +33,13 @@ OfficeMail(Cyrus IMAP + Postfix 기반) 전용이며,
 세션 내부:
 
 ```text
-/plugin marketplace add nextintelligence-ai/officemail-official
+/plugin marketplace add jiransoft/om-official
 ```
 
 또는 CLI:
 
 ```bash
-claude plugin marketplace add nextintelligence-ai/officemail-official
+claude plugin marketplace add jiransoft/om-official
 ```
 
 ##### 2단계 — 플러그인 설치
@@ -70,7 +70,7 @@ claude plugin install officemail@officemail
 
 Claude Desktop에서 MCP 서버로 사용할 수 있습니다.
 
-1. [릴리즈 페이지](https://github.com/nextintelligence-ai/officemail-official/releases)에서
+1. [릴리즈 페이지](https://github.com/jiransoft/om-official/releases)에서
    플랫폼에 맞는 `.mcpb` 파일을 다운로드합니다 (`officemail-{platform}.mcpb`)
 2. 더블클릭하면 바이너리와 MCP 서버 설정이 자동으로 설치됩니다
 3. 터미널에서 인증을 설정합니다:
@@ -113,7 +113,7 @@ Claude Code 시작 시 마켓플레이스 갱신과 플러그인 업데이트가
 
 #### Claude Desktop
 
-[릴리즈 페이지](https://github.com/nextintelligence-ai/officemail-official/releases)에서
+[릴리즈 페이지](https://github.com/jiransoft/om-official/releases)에서
 최신 `.mcpb` 파일을 다운로드하여 더블클릭하면 덮어쓰기 설치됩니다.
 
 ### 제거
@@ -135,7 +135,7 @@ claude plugin uninstall officemail
 마켓플레이스도 제거하려면:
 
 ```bash
-claude plugin marketplace remove nextintelligence-ai/officemail-official
+claude plugin marketplace remove jiransoft/om-official
 ```
 
 #### Claude Desktop
@@ -294,13 +294,13 @@ Claude Code에서 자연어로 사용할 수 있습니다:
 - **Hooks** — 첫 세션 시작 시 `omail` 실행파일 자동 설치
 - **실행파일** — macOS, Linux, Windows (arm64, x64) 6개 플랫폼 빌드 제공
 
-실행파일은 [릴리즈 페이지](https://github.com/nextintelligence-ai/officemail-official/releases)에서
+실행파일은 [릴리즈 페이지](https://github.com/jiransoft/om-official/releases)에서
 다운로드할 수 있으며, 플러그인 설치 시 자동으로 다운로드됩니다.
 
 ### 수동 설치
 
 ```bash
-curl -L -o omail https://github.com/nextintelligence-ai/officemail-official/releases/latest/download/omail-darwin-arm64
+curl -L -o omail https://github.com/jiransoft/om-official/releases/latest/download/omail-darwin-arm64
 chmod +x omail
 sudo mv omail /usr/local/bin/
 ```
