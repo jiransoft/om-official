@@ -122,7 +122,7 @@ Contacts integrate with mail and calendar for workflows like
 
     ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard get --params '{"ids":["..."]}'
     ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard query --params '{"filter":{"text":"alice"}}'
-    ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard set --json '{"create":{"c1":{"fullName":"Test","emails":{"e1":{"address":"test@example.com"}}}}}'
+    ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard set --json '{"create":{"c1":{"name":{"@type":"Name","full":"Test"},"emails":{"e1":{"address":"test@example.com"}}}}}'
     ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard changes --params '{"sinceState":"<state>"}'
     ${CLAUDE_PLUGIN_DATA}/omail contacts contactcard queryChanges --params '{"sinceQueryState":"<qs>","filter":{}}'
     ${CLAUDE_PLUGIN_DATA}/omail contacts addressbook get --params '{}'
@@ -133,12 +133,17 @@ Contacts integrate with mail and calendar for workflows like
 - Server must support `urn:ietf:params:jmap:contacts` capability
   (check with `omail doctor`)
 - ContactCard follows JSContact format (RFC 9553)
+- The display name lives at `name.full`. Writing a top-level
+  `fullName` (as older versions did) is stored but never matched
+  by `contactcard query`, so the contact becomes unsearchable by
+  name. Reads still understand cards written the old way.
 - `+add` requires both `--name` and `--email`; for phone-only
   contacts, use raw `contactcard set`
 - `+update --email` appends a new email address to the contact;
   it does not replace existing ones. Use raw `contactcard set`
   to replace.
 - `+list` returns summary fields: id, fullName, emails, phones.
-  Use `+get` for all fields.
+  The `fullName` output key carries the card's display name from
+  either shape. Use `+get` for all fields.
 - Always use `--dry-run` first when creating or modifying
   contacts via AI
