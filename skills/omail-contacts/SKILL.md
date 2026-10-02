@@ -77,7 +77,8 @@ argument-hint: "[list | search | add | update | delete | get | addressbooks]"
 
     ${CLAUDE_PLUGIN_DATA}/omail contacts +update --contact-id <id> --name "New Name"
     ${CLAUDE_PLUGIN_DATA}/omail contacts +update --contact-id <id> --email new@example.com
-    ${CLAUDE_PLUGIN_DATA}/omail contacts +update --contact-id <id> --phone "010-0000-0000"
+    ${CLAUDE_PLUGIN_DATA}/omail contacts +update --contact-id <id> --phone "010-0000-0000"      # replaces all numbers
+    ${CLAUDE_PLUGIN_DATA}/omail contacts +update --contact-id <id> --add-phone "010-1111-2222"  # keeps existing numbers
 
 ### Delete contact
 
@@ -142,6 +143,12 @@ Contacts integrate with mail and calendar for workflows like
 - `+update --email` appends a new email address to the contact;
   it does not replace existing ones. Use raw `contactcard set`
   to replace.
+- `+update --phone` replaces every phone number on the card;
+  `--add-phone` appends one and keeps the rest.
+- `--addressbook` on `+add` sends both `addressBookIds` (RFC 9610)
+  and the draft `addressBookId`, which the deployed server needs.
+  `+list --addressbook` falls back to filtering client-side when
+  the server rejects the `inAddressBook` filter.
 - `+list` returns summary fields: id, fullName, emails, phones.
   The `fullName` output key carries the card's display name from
   either shape. Use `+get` for all fields.

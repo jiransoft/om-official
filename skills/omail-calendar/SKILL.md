@@ -42,16 +42,16 @@ argument-hint: "[agenda | insert | update | delete | freebusy | rsvp | copy | pa
 
 ## Event Helpers
 
-| Command     | Description                                                                     |
-| ----------- | ------------------------------------------------------------------------------- |
-| `+agenda`   | Upcoming events (default: 7 days, `--page-all`)                                 |
-| `+insert`   | Create event (`--rrule`, `--alert`, `--online`, `--all-day`, `--invite`)        |
-| `+update`   | Update event (`--series`, `--recurrence-id`, `--add-invite`, `--remove-invite`) |
-| `+delete`   | Delete event (`--series`, `--recurrence-id`)                                    |
-| `+freebusy` | Check free/busy status for a time range                                         |
-| `+rsvp`     | Accept, decline, or tentative an invitation                                     |
-| `+copy`     | Copy event to another account (CalendarEvent/copy)                              |
-| `+parse`    | Parse iCalendar data into JSCalendar (CalendarEvent/parse)                      |
+| Command     | Description                                                                      |
+| ----------- | -------------------------------------------------------------------------------- |
+| `+agenda`   | Upcoming events (default: 7 days, `--page-all`)                                  |
+| `+insert`   | Create event (`--tz`, `--rrule`, `--alert`, `--online`, `--all-day`, `--invite`) |
+| `+update`   | Update event (`--series`, `--recurrence-id`, `--tz`, `--add-invite`)             |
+| `+delete`   | Delete event (`--series`, `--recurrence-id`)                                     |
+| `+freebusy` | Check free/busy status for a time range                                          |
+| `+rsvp`     | Accept, decline, or tentative an invitation                                      |
+| `+copy`     | Copy event to another account (CalendarEvent/copy)                               |
+| `+parse`    | Parse iCalendar data into JSCalendar (CalendarEvent/parse)                       |
 
 ## Calendar Management (no `+` prefix)
 
@@ -169,11 +169,26 @@ When the user says "change the recurring meeting" without specifying which one:
 
 - Server must support `urn:ietf:params:jmap:calendars` capability
   (check with `omail doctor`)
-- Dates use ISO 8601 local time, no milliseconds: `2026-03-25T10:00:00`
+- Dates use ISO 8601: `2026-03-25T10:00:00`. A value without an offset is
+  wall time in the event's zone; a value with `Z` or an offset
+  (`2026-03-25T10:00:00+09:00`) is converted to that zone
+- `+insert` pins every timed event to a `timeZone`: `--tz <IANA zone>`, or
+  the system zone (e.g. `Asia/Seoul`) when omitted. `--floating` creates an
+  event with no zone and accepts local times only
+- `+update --start` keeps the event's zone unless `--tz` changes it; a
+  floating event given a `Z`/offset time is pinned to the system zone
+- Durations are elapsed time between the start and end instants, so an
+  event across a DST change keeps its real length
+- An offset start that falls in the second pass of a DST fall-back hour
+  (e.g. `2026-11-01T01:30:00-05:00` in `America/New_York`) cannot be stored
+  as local time in that zone and is rejected — use `--tz UTC` or the
+  earlier offset
 - `--rrule` takes JSCalendar RecurrenceRule JSON;
   `frequency` is required (weekly, daily, monthly, etc.)
 - `--series` updates/deletes the entire recurring series;
-  `--recurrence-id <UTC-datetime>` targets a single instance
+  `--recurrence-id <datetime>` targets a single instance by its original
+  start, local to the event's zone (`Z`/offset input is converted; for a
+  floating event the wall time is used as given)
 - Updating/deleting a recurring event without `--series` or
   `--recurrence-id` returns an error prompting the user to specify
 - `--alert <minutes>` is repeatable; `--use-default-alerts` overrides custom alerts
@@ -183,6 +198,14 @@ When the user says "change the recurring meeting" without specifying which one:
   (`YYYY-MM-DDT00:00:00`) with `showWithoutTime: true` — a bare date is
   rejected by the server
 - `--add-invite` auto-creates organizer from session when event has no participants
+- The organizer participant is created with `participationStatus: accepted`
+- `+agenda` and `+freebusy` (without `--email`) apply each occurrence's
+  override (changed title, time, status), including one moved into the
+  window from another day, and compare times in each event's own zone
+- `+agenda` lists events that start in the window; `+freebusy` (without
+  `--email`) reports every event that overlaps it, skipping cancelled
+  events and `freeBusyStatus: free`. Each slot's `start` is local to its
+  `timeZone` field (absent or null means floating)
 - `+copy` requires target account to have calendar capability
 - `+parse` checks capability + catches unknownMethod (belt+suspenders)
 - Calendar sharing is the `shareWith` property of `Calendar/set` under

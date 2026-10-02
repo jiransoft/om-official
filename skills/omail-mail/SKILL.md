@@ -92,7 +92,8 @@ argument-hint: "[send | reply | forward | triage | read | search | move | flag |
     ${CLAUDE_PLUGIN_DATA}/omail mail +draft --to alice@example.com --subject "Draft" --body "WIP"
     ${CLAUDE_PLUGIN_DATA}/omail mail +move --message-id <id> --to Archive
     ${CLAUDE_PLUGIN_DATA}/omail mail +flag --message-id <id> --set '$flagged'
-    ${CLAUDE_PLUGIN_DATA}/omail mail +flag --message-id <id> --unset '$seen'
+    ${CLAUDE_PLUGIN_DATA}/omail mail +flag --message-id <id> --unset seen          # seen → $seen
+    ${CLAUDE_PLUGIN_DATA}/omail mail +flag --message-id <id> --set project_x       # custom keyword, stored as given
     ${CLAUDE_PLUGIN_DATA}/omail mail +watch                            # enriched new email stream
     ${CLAUDE_PLUGIN_DATA}/omail mail +watch --raw                      # raw SSE events
     ${CLAUDE_PLUGIN_DATA}/omail mail +watch --ping 30                  # custom ping interval
@@ -113,11 +114,11 @@ argument-hint: "[send | reply | forward | triage | read | search | move | flag |
 
 ## +triage flags
 
-| Flag         | Required | Default | Description          |
-| ------------ | -------- | ------- | -------------------- |
-| `--mailbox`  | No       | INBOX   | Mailbox name or role |
-| `--limit`    | No       | 50      | Max results per page |
-| `--page-all` | No       | false   | Fetch all pages      |
+| Flag         | Required | Default | Description                     |
+| ------------ | -------- | ------- | ------------------------------- |
+| `--mailbox`  | No       | INBOX   | Mailbox id, path, name, or role |
+| `--limit`    | No       | 50      | Max results per page            |
+| `--page-all` | No       | false   | Fetch all pages                 |
 
 ## +triage output (JSON)
 
@@ -228,6 +229,17 @@ worker-routed queries. Same `--output json` shape from both backends.
 ## Notes
 
 - Handles MIME encoding automatically via JMAP EmailSubmission
+- `-a`/`--attach` parts are sent with `disposition: attachment`
+  (text files also with `charset: utf-8`), so the bytes arrive
+  unchanged; a rejected send is not retried unless the server
+  rejected the Drafts `mailboxIds`
+- `--mailbox` / `--to` (move) resolve a mailbox by id, then exact
+  path (`Parent/Child` or `Parent.Child`), then exact name at any
+  depth, then role (`inbox`, `junk`, …). A folder named `Junk` wins
+  over the role=junk folder; an ambiguous name is an error
+- `+flag` maps `seen`, `flagged`, `answered`, `draft`, `forwarded`,
+  `junk`, `notjunk`, `phishing`, `mdnsent` to their `$` keywords;
+  any other keyword is stored exactly as given
 - Use --dry-run first when composing with an AI agent
 - Requires server support for `urn:ietf:params:jmap:submission`
 - `searchsnippet get` requires BOTH `filter` and `emailIds` in
