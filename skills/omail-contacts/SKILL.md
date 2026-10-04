@@ -149,6 +149,9 @@ Contacts integrate with mail and calendar for workflows like
   and the draft `addressBookId`, which the deployed server needs.
   `+list --addressbook` falls back to filtering client-side when
   the server rejects the `inAddressBook` filter.
+  Both depend on the server's address book support; on the current
+  OfficeMail servers they work through this compatibility path
+  (0.2.102+).
 - `+list` returns summary fields: id, fullName, emails, phones.
   The `fullName` output key carries the card's display name from
   either shape. Use `+get` for all fields.

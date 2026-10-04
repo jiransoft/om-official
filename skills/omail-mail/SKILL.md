@@ -98,6 +98,27 @@ argument-hint: "[send | reply | forward | triage | read | search | move | flag |
     ${CLAUDE_PLUGIN_DATA}/omail mail +watch --raw                      # raw SSE events
     ${CLAUDE_PLUGIN_DATA}/omail mail +watch --ping 30                  # custom ping interval
 
+### Watch timing
+
+- The server does not push each change. Its EventSource re-reads the
+  account's change counters every `jmap_pushpoll` seconds (Cyrus default
+  60s; OfficeMail servers keep it) and sends a `StateChange` only when a
+  counter moved, so a `StateChange` arrives 0–60s after the change
+- Between polls the stream carries only the `ping` events requested with
+  `--ping` (default 10s). `--raw` prints them; the default output hides them
+- Without `--raw`, omail also runs `Email/changes` on every ping, so new
+  mail can show before its `StateChange`. With `--raw`, 30–40s of silence
+  after a test mail is normal, not a failure
+- To wait for or verify a change with `+watch`:
+  1. Start the watcher first, then make the change
+  2. Wait at least 70s before concluding that no event came
+  3. Use `--raw` to see that pings still arrive. Pings prove the
+     connection is alive; they are not the change
+  4. Stop the watcher by the PID you started. Never use `pkill` or `killall`
+- For a quick yes/no on whether something changed, poll the state instead
+  of waiting on the stream: run `mail email changes` with the last known
+  state (see **Raw methods**), or query the item directly
+
 ## +send flags
 
 | Flag           | Required | Description                                  |
@@ -114,11 +135,11 @@ argument-hint: "[send | reply | forward | triage | read | search | move | flag |
 
 ## +triage flags
 
-| Flag         | Required | Default | Description                     |
-| ------------ | -------- | ------- | ------------------------------- |
-| `--mailbox`  | No       | INBOX   | Mailbox id, path, name, or role |
-| `--limit`    | No       | 50      | Max results per page            |
-| `--page-all` | No       | false   | Fetch all pages                 |
+| Flag         | Required | Default | Description                                                           |
+| ------------ | -------- | ------- | --------------------------------------------------------------------- |
+| `--mailbox`  | No       | inbox   | Mailbox id, path, name, or role; omitted means the role=inbox mailbox |
+| `--limit`    | No       | 50      | Max results per page                                                  |
+| `--page-all` | No       | false   | Fetch all pages                                                       |
 
 ## +triage output (JSON)
 
@@ -202,6 +223,16 @@ reason). To force a specific backend, pass `--backend jmap` or
 Note `--dry-run` always previews the JMAP request shape, even for
 worker-routed queries. Same `--output json` shape from both backends.
 
+- Free text is matched differently: `opensearch` matches each word on
+  its own (OR, ranked by relevance); `jmap` matches the text as one
+  contiguous substring, so word order matters
+- Neither backend treats double quotes as a phrase operator. omail passes
+  them through, they are matched literally, and the search usually
+  returns 0. Search unquoted
+- `--backend opensearch` with `--mailbox` fails with
+  `--backend opensearch cannot serve this query (mailbox-filter)`;
+  automatic routing sends such queries to `jmap`
+
 ### Draft for review
 
 1. `${CLAUDE_PLUGIN_DATA}/omail mail +draft --to <email> --subject "..." --body "..."`
@@ -233,6 +264,10 @@ worker-routed queries. Same `--output json` shape from both backends.
   (text files also with `charset: utf-8`), so the bytes arrive
   unchanged; a rejected send is not retried unless the server
   rejected the Drafts `mailboxIds`
+- When the server rejects an `Email/set` create (e.g.
+  `invalidProperties`, `blobNotFound`), it still leaves one partial
+  `$draft` message in Drafts. After a failed send, check Drafts and
+  delete leftovers that carry your subject
 - `--mailbox` / `--to` (move) resolve a mailbox by id, then exact
   path (`Parent/Child` or `Parent.Child`), then exact name at any
   depth, then role (`inbox`, `junk`, …). A folder named `Junk` wins

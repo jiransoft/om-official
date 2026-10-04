@@ -188,7 +188,9 @@ When the user says "change the recurring meeting" without specifying which one:
 - `--series` updates/deletes the entire recurring series;
   `--recurrence-id <datetime>` targets a single instance by its original
   start, local to the event's zone (`Z`/offset input is converted; for a
-  floating event the wall time is used as given)
+  floating event the wall time is used as given). A `Z`/offset value that
+  also names a time skipped by a DST change, or the repeated hour, is
+  refused — pass the local time then
 - Updating/deleting a recurring event without `--series` or
   `--recurrence-id` returns an error prompting the user to specify
 - `--alert <minutes>` is repeatable; `--use-default-alerts` overrides custom alerts
@@ -206,7 +208,19 @@ When the user says "change the recurring meeting" without specifying which one:
   `--email`) reports every event that overlaps it, skipping cancelled
   events and `freeBusyStatus: free`. Each slot's `start` is local to its
   `timeZone` field (absent or null means floating)
+- Occurrences of a recurring event in `+agenda` / `+freebusy` output carry
+  `recurrenceId`, the occurrence's original start. Pass that (not `start`,
+  which an override may have moved) to `--recurrence-id`
+- `+update --recurrence-id` keeps the occurrence's existing changes (a
+  moved start, its own attendees and RSVPs) and applies only the fields
+  given; `--start` is read in the occurrence's own zone
+- `+update --series --start/--tz` is refused while the series has
+  per-occurrence changes (exclusions or edits): those are keyed to the
+  current start times and would be detached. Change single occurrences
+  with `--recurrence-id`, or remove the changes first
 - `+copy` requires target account to have calendar capability
+- `+copy` to the same account returns `invalidArguments`. Copy only to
+  another account in the session where you have write rights
 - `+parse` checks capability + catches unknownMethod (belt+suspenders)
 - Calendar sharing is the `shareWith` property of `Calendar/set` under
   `urn:ietf:params:jmap:calendars` — no separate sharing capability exists.
@@ -216,5 +230,6 @@ When the user says "change the recurring meeting" without specifying which one:
   the CLI reads `recurrenceOverrides` first and seeds the map when it is
   null (a pointer patch into a null map is `invalidPatch` per RFC 8620)
 - Multi-user freebusy (`--email`) requires
-  `urn:ietf:params:jmap:principals` capability
+  `urn:ietf:params:jmap:principals` capability. It covers principals on
+  the same server only; an address on another server returns `notFound`
 - Always use `--dry-run` first when creating or modifying events via AI
