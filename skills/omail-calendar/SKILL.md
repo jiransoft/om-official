@@ -42,16 +42,16 @@ argument-hint: "[agenda | insert | update | delete | freebusy | rsvp | copy | pa
 
 ## Event Helpers
 
-| Command     | Description                                                                      |
-| ----------- | -------------------------------------------------------------------------------- |
-| `+agenda`   | Upcoming events (default: 7 days, `--page-all`)                                  |
-| `+insert`   | Create event (`--tz`, `--rrule`, `--alert`, `--online`, `--all-day`, `--invite`) |
-| `+update`   | Update event (`--series`, `--recurrence-id`, `--tz`, `--add-invite`)             |
-| `+delete`   | Delete event (`--series`, `--recurrence-id`)                                     |
-| `+freebusy` | Check free/busy status for a time range                                          |
-| `+rsvp`     | Accept, decline, or tentative an invitation                                      |
-| `+copy`     | Copy event to another account (CalendarEvent/copy)                               |
-| `+parse`    | Parse iCalendar data into JSCalendar (CalendarEvent/parse)                       |
+| Command     | Description                                                                              |
+| ----------- | ---------------------------------------------------------------------------------------- |
+| `+agenda`   | Upcoming events (default: 7 days, `--page-all`)                                          |
+| `+insert`   | Create event (`--tz`, `--rrule`, `--alert`, `--online`, `--all-day`, `--invite`)         |
+| `+update`   | Update event (`--series`, `--recurrence-id`, `--add-occurrence`, `--tz`, `--add-invite`) |
+| `+delete`   | Delete event (`--series`, `--recurrence-id`)                                             |
+| `+freebusy` | Check free/busy status for a time range                                                  |
+| `+rsvp`     | Accept, decline, or tentative an invitation                                              |
+| `+copy`     | Copy event to another account (CalendarEvent/copy)                                       |
+| `+parse`    | Parse iCalendar data into JSCalendar (CalendarEvent/parse)                               |
 
 ## Calendar Management (no `+` prefix)
 
@@ -191,6 +191,25 @@ When the user says "change the recurring meeting" without specifying which one:
   floating event the wall time is used as given). A `Z`/offset value that
   also names a time skipped by a DST change, or the repeated hour, is
   refused — pass the local time then
+- `--recurrence-id` must name an occurrence of the series (checked against
+  the server's expansion, or omail's own when the server cannot expand);
+  otherwise the command fails, naming the nearest occurrences. An override
+  for a time the series does not produce would add an instance, so adding
+  a date is explicit: `+update --recurrence-id <new date> --add-occurrence`.
+  When the server cannot expand the series and its rule uses parts omail's
+  own expansion does not handle (by-month-day, by-month, by-hour, set
+  positions, nth weekdays, excluded rules, a monthly/yearly start after day
+  28, a weekly by-day list without the start's weekday, an until with
+  fractional seconds on the start or the until, …), the check refuses
+  instead of guessing
+- For an occurrence in a spring-forward gap the server expands it at the
+  shifted time (02:30 → 03:30 in New York) on the gap day and, for a series
+  that had that occurrence, the day after, then returns to 02:30; `+agenda` reports the RFC 5545 time (02:30) until
+  an override exists under the server's id. Either id works: omail writes
+  under the server's id and says so on stderr. If the server cannot expand
+  the series, such an id is refused (omail cannot know the server's key);
+  pass the server's id with `--add-occurrence` instead. Server errors other
+  than "cannot expand" fail the command rather than skip the check
 - Updating/deleting a recurring event without `--series` or
   `--recurrence-id` returns an error prompting the user to specify
 - `--alert <minutes>` is repeatable; `--use-default-alerts` overrides custom alerts

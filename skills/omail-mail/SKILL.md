@@ -106,11 +106,13 @@ argument-hint: "[send | reply | forward | triage | read | search | move | flag |
   counter moved, so a `StateChange` arrives 0–60s after the change
 - Between polls the stream carries only the `ping` events requested with
   `--ping` (default 10s). `--raw` prints them; the default output hides them
-- Without `--raw`, omail also runs `Email/changes` on every ping, so new
-  mail can show before its `StateChange`. With `--raw`, 30–40s of silence
-  after a test mail is normal, not a failure
+- Without `--raw`, omail takes its baseline when it starts and runs
+  `Email/changes` on every ping, so new mail can show before its
+  `StateChange`. With `--raw`, 30–40s of silence after a test mail is
+  normal, not a failure
 - To wait for or verify a change with `+watch`:
-  1. Start the watcher first, then make the change
+  1. Start the watcher and wait until stderr shows `Baseline state: …`
+     (without `--raw`; `--raw` takes no baseline), then make the change
   2. Wait at least 70s before concluding that no event came
   3. Use `--raw` to see that pings still arrive. Pings prove the
      connection is alive; they are not the change
@@ -140,6 +142,10 @@ argument-hint: "[send | reply | forward | triage | read | search | move | flag |
 | `--mailbox`  | No       | inbox   | Mailbox id, path, name, or role; omitted means the role=inbox mailbox |
 | `--limit`    | No       | 50      | Max results per page                                                  |
 | `--page-all` | No       | false   | Fetch all pages                                                       |
+
+Pass no `--mailbox` (not `INBOX`) to read the inbox: `--mailbox INBOX`
+resolves by exact name, so a nested folder named `INBOX` wins over the
+role inbox.
 
 ## +triage output (JSON)
 
@@ -189,6 +195,25 @@ When the user says "reply to this email" without specifying which one:
 
 - `+forward` — creates a new email with `Fwd:` subject and `From: you`
 - `+forward --raw` — same as forward but without the separator header
+- When the original has HTML, `+reply`, `+reply-all` and `+forward` send
+  `text/html` (the original markup under the quote or forward block) with
+  a derived `text/plain` alternative; a text-only original gets text only.
+  The original's style sheets are not sent — they would restyle your text
+  and the forward header — so a quote can look plainer than the original:
+  `<style>` and `<link rel=stylesheet>` are dropped, and so are Outlook
+  conditional comments that hold a sheet (`<!--[if mso]><style>`) and
+  `<iframe>`, `<noframes>`, `<noembed>` and `<template>`; `<noscript>` is
+  read as markup. Inline `style` attributes stay; the original `<body>`'s
+  style, colors and `background` image move to a `<div>` around the
+  quote, and the `<html>` tag's style to a `<div>` around that.
+  The original's parts go only with `+forward --include-attachments`:
+  images the sent HTML shows by `cid:` (in `src`, `background` or CSS
+  `url()`) then go inline with their Content-ID, the rest as attachments.
+  Without the flag (and always for `+reply`/`+reply-all`) nothing of the
+  original is attached, so `cid:` images in the quote show as broken
+- `+reply` and `+reply-all` mark the original `$answered` once the reply
+  is sent (a separate request; if it fails, stderr warns and the reply
+  still counts as sent)
 - `+redirect` — bounces original as-is with `Resent-*` headers,
   original `From` preserved
 
@@ -260,6 +285,20 @@ worker-routed queries. Same `--output json` shape from both backends.
 ## Notes
 
 - Handles MIME encoding automatically via JMAP EmailSubmission
+- `--to`/`--cc`/`--bcc` on `+send`, `+draft`, `+forward` and `+redirect`
+  are checked before any request, with the same rule as the MCP tools
+  (zod `email()`): a bad address exits non-zero naming it, also under
+  `--dry-run`. Pass bare addresses (`a@example.com`, not `Name <a@…>`,
+  and with no surrounding spaces — the string is checked as sent);
+  non-ASCII addresses are refused by this rule; a punycode `xn--` domain
+  passes only under an ASCII top-level domain (`a@xn--…kr` passes,
+  `a@xn--….xn--3e0b707e` does not)
+- `+reply-all` puts everyone else from the original in Cc once: the
+  sender's own address and anyone already in To are left out
+  (case-insensitive)
+- `+read` returns `body.text` from the `text/plain` parts and
+  `body.html` from the `text/html` parts; for HTML-only mail `body.text`
+  is converted from the HTML
 - `-a`/`--attach` parts are sent with `disposition: attachment`
   (text files also with `charset: utf-8`), so the bytes arrive
   unchanged; a rejected send is not retried unless the server
