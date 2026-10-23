@@ -3,7 +3,7 @@
 OfficeMail 서비스의 공식 마켓플레이스입니다.
 메일, 캘린더 등 OfficeMail이 제공하는 서비스를 AI 에이전트에서 사용할 수 있습니다.
 
-## OfficeMail CLI 0.2.107
+## OfficeMail CLI 0.2.108
 
 AI 에이전트가 OfficeMail 서비스의 이메일과 캘린더를 읽고, 보내고, 관리할 수 있는
 Claude Code 플러그인입니다.
@@ -115,6 +115,33 @@ claude plugin uninstall officemail
 ```bash
 claude plugin marketplace remove jiransoft/om-official
 ```
+
+#### Claude Desktop 확장 (배포 중단)
+
+0.2.106부터 Claude Desktop 확장(`.mcpb`)은 배포하지 않으며, 이전 릴리스의
+`.mcpb` 파일도 더 이상 내려받을 수 없습니다. 이미 설치한 확장은 그대로
+동작하지만 업데이트는 받을 수 없습니다.
+
+Claude Desktop 등 MCP 클라이언트에서는 원격 OfficeMail MCP 서버를 씁니다.
+연결 방법은
+[OfficeMail MCP Server 사용법](https://github.com/jiransoft/om-core/blob/main/docker/mcp-server/USAGE.md)을
+참고하세요.
+
+예전 확장을 정리하려면:
+
+1. Claude Desktop에서 OfficeMail 확장을 제거합니다. 남은 파일이 있으면
+   확장 폴더를 지웁니다:
+   - **macOS**: `~/Library/Application Support/Claude/Claude Extensions/local.mcpb.jiran.com.officemail/`
+   - **Windows**: `%LOCALAPPDATA%\Claude\Claude Extensions\local.mcpb.jiran.com.officemail\`
+2. 확장 대신 `omail mcp serve`를 MCP 설정 파일에 직접 등록했다면 그
+   `officemail` 항목을 삭제합니다. 0.2.106 이상의 `omail`에는 이 명령이
+   없어 서버가 시작되지 않습니다.
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+3. Claude Desktop을 재시작합니다.
+
+인증 정보는 CLI, Claude Code 플러그인과 공유합니다. 둘 중 하나를 계속
+쓴다면 그대로 두고, 모두 쓰지 않는다면 아래 단계로 지웁니다.
 
 #### 인증 및 데이터 제거
 
