@@ -140,7 +140,7 @@ This is a full factory reset — the user must set up from scratch.
 - Config stored at `~/.config/officemail/config.json` (chmod 600)
 - Multi-profile: config uses `{ default, profiles: { name: config } }` format
 - Old single-account config is auto-migrated on first load
-- Claude Code plugin, Claude Desktop MCP, and CLI all share the same config
+- Claude Code plugin and CLI share the same config
 - OAuth tokens auto-renew: any command hitting a 401 with a valid refresh
   token mints a new access token and retries — including `doctor` and
   `auth refresh`. A `doctor` auth failure means the refresh token itself is
@@ -152,5 +152,3 @@ This is a full factory reset — the user must set up from scratch.
   lifetimes are short and server-controlled (e.g. dev is shorter than prod),
   but the renewal is transparent.
 - `--profile` selects auth credentials; `--account` overrides JMAP accountId
-- MCP tools accept an optional `profile` parameter for per-call profile selection
-- MCP `account_switch` sets session-level default (in-process, does not persist)

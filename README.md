@@ -3,10 +3,10 @@
 OfficeMail 서비스의 공식 마켓플레이스입니다.
 메일, 캘린더 등 OfficeMail이 제공하는 서비스를 AI 에이전트에서 사용할 수 있습니다.
 
-## OfficeMail CLI 0.2.105
+## OfficeMail CLI 0.2.106
 
 AI 에이전트가 OfficeMail 서비스의 이메일과 캘린더를 읽고, 보내고, 관리할 수 있는
-Claude Code 플러그인이자 MCP 서버입니다.
+Claude Code 플러그인입니다.
 OfficeMail(Cyrus IMAP + Postfix 기반) 전용이며,
 다른 이메일 서비스나 JMAP 서버에서는 동작하지 않습니다.
 
@@ -64,21 +64,6 @@ claude plugin install officemail@officemail
 /officemail:omail-setup
 ```
 
-#### Claude Desktop
-
-Claude Desktop에서 MCP 서버로 사용할 수 있습니다.
-
-1. [릴리즈 페이지](https://github.com/jiransoft/om-official/releases)에서
-   플랫폼에 맞는 `.mcpb` 파일을 다운로드합니다 (`officemail-{platform}.mcpb`)
-2. 더블클릭하면 바이너리와 MCP 서버 설정이 자동으로 설치됩니다
-3. 터미널에서 인증을 설정합니다:
-
-   ```bash
-   omail auth setup --email you@company.com
-   ```
-
-4. Claude Desktop을 재시작하면 도구(tools)를 사용할 수 있습니다
-
 ### 업데이트
 
 #### Claude Code
@@ -109,11 +94,6 @@ Claude Code 시작 시 마켓플레이스 갱신과 플러그인 업데이트가
 써드파티 마켓플레이스는 기본 비활성화이므로 직접 켜야 합니다.
 실행파일(`omail`) 업데이트를 위해 세션 재시작이 필요합니다.
 
-#### Claude Desktop
-
-[릴리즈 페이지](https://github.com/jiransoft/om-official/releases)에서
-최신 `.mcpb` 파일을 다운로드하여 더블클릭하면 덮어쓰기 설치됩니다.
-
 ### 제거
 
 #### Claude Code
@@ -136,17 +116,10 @@ claude plugin uninstall officemail
 claude plugin marketplace remove jiransoft/om-official
 ```
 
-#### Claude Desktop
-
-1. MCP 설정 파일에서 `officemail` 항목을 삭제합니다:
-   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-2. Claude Desktop을 재시작합니다
-
 #### 인증 및 데이터 제거
 
 `~/.config/officemail/`의 설정 파일과 시스템 키체인의 인증 토큰은
-CLI, Claude Code 플러그인, Claude Desktop MCP 서버가 공유합니다.
+CLI와 Claude Code 플러그인이 공유합니다.
 **모든 클라이언트를 제거한 후에만** 삭제하세요:
 
 ```bash
@@ -185,7 +158,7 @@ ls ~/.config/officemail      # "No such file or directory"이면 정상
 인증 토큰은 플랫폼 보안 저장소(macOS Keychain, Linux Secret Service,
 Windows DPAPI)에 저장됩니다. 설정 파일(`~/.config/officemail/config.json`)에는
 토큰이 포함되지 않습니다.
-Claude Code 플러그인, Claude Desktop MCP 서버, CLI 모두 같은 인증 정보를
+Claude Code 플러그인과 CLI 모두 같은 인증 정보를
 공유하므로 한 곳에서 인증하면 어디서든 사용할 수 있습니다.
 
 ```bash
@@ -225,9 +198,6 @@ omail --profile work auth report admin@co.com  # 특정 프로필 기준
 omail --profile work mail +triage
 omail --profile personal calendar +agenda
 ```
-
-MCP 도구에서는 `profile` 파라미터로 프로필을 지정하거나,
-`account_switch` 도구로 세션 내 기본 프로필을 변경할 수 있습니다.
 
 ### 주요 기능
 

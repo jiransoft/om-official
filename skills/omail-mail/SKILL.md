@@ -286,9 +286,8 @@ worker-routed queries. Same `--output json` shape from both backends.
 
 - Handles MIME encoding automatically via JMAP EmailSubmission
 - `--to`/`--cc`/`--bcc` on `+send`, `+draft`, `+forward` and `+redirect`
-  are checked before any request, with the same rule as the MCP tools
-  (zod `email()`): a bad address exits non-zero naming it, also under
-  `--dry-run`. Pass bare addresses (`a@example.com`, not `Name <a@…>`,
+  are checked before any request with zod `email()`: a bad address exits
+  non-zero naming it, also under `--dry-run`. Pass bare addresses (`a@example.com`, not `Name <a@…>`,
   and with no surrounding spaces — the string is checked as sent);
   non-ASCII addresses are refused by this rule; a punycode `xn--` domain
   passes only under an ASCII top-level domain (`a@xn--…kr` passes,
